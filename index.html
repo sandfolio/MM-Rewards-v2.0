@@ -277,7 +277,7 @@ em.acc{font-family:inherit;font-style:normal;font-weight:inherit;color:var(--acc
 .dots i{width:6px;height:6px;border-radius:3px;background:#D7D7D7}
 .dots i.on{width:18px;background:#B8860B}
 .wcard{padding:22px 16px 18px;display:flex;flex-direction:column;gap:16px;align-items:stretch}
-.wcard .link-u{align-self:center}
+.wcard .link-u{align-self:flex-start}
 .worth{font-size:44px;font-weight:800;line-height:1.1;color:var(--ink);letter-spacing:-.02em}
 .balrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .bal2{background:#F4F4F4;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
@@ -379,7 +379,8 @@ em.acc{font-family:inherit;font-style:normal;font-weight:inherit;color:var(--acc
 .mrow:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:12px}
 
 /* UC 2: balances only */
-.hbody>.sec:first-child:has(.circles){padding-top:24px}
+.page-t{margin:0;padding:0 4px;font-family:var(--font-serif);font-weight:400;font-size:34px;line-height:1.1;letter-spacing:-.01em;color:var(--ink)}
+.page-t+.sec:has(.circles){padding-top:14px}
 .wcard.uc2{padding:18px 16px 16px;gap:14px}
 .wcard.uc2 .bal2{padding:14px 12px;gap:12px}
 .wcard.uc2 .bal2 .bic{width:36px;height:36px}
@@ -484,12 +485,11 @@ em.acc{font-family:inherit;font-style:normal;font-weight:inherit;color:var(--acc
   <aside class="rail">
     <div class="label">Mint Money · Rewards</div>
     <h1>Rewards hub prototype</h1>
-    <p class="hide-sm">Cashback, coins and MM credit in one place. Every action updates the live balances, so you can spin, scratch, claim a milestone and then spend the coins in the store.</p>
-    <div class="concept" id="conceptBox" role="group" aria-label="Rewards widget concept"></div>
+    <p class="hide-sm">Cashback, coins and vouchers in one place. Every action updates the live balances, so you can spin, scratch, claim a milestone and then spend the coins in the store.</p>
     <nav class="rail-nav" id="railNav" aria-label="Screens"></nav>
     <div class="concept" id="demoBox" hidden></div>
     <div class="state" id="stateBox" aria-live="polite"></div>
-    <p class="hide-sm cap" style="color:var(--n-600)">“Pay now” on bill rows simulates a payment so you can see a scratch card and milestone progress arrive. Brand names are placeholders. 24 coins = ₹1 · 1 MM credit = ₹5.</p>
+    <p class="hide-sm cap" style="color:var(--n-600)">“Pay now” on bill rows simulates a payment so you can see a scratch card and milestone progress arrive. Brand names are placeholders.  24 coins = ₹1.</p>
     <button class="reset" id="resetBtn">Reset prototype</button>
   </aside>
 
@@ -555,9 +555,6 @@ const BRANDS = {
 const mono = (b,s=40)=>`<span class="mono" style="width:${s}px;height:${s}px;background:${BRANDS[b].bg};color:${BRANDS[b].fg}">${b[0]}</span>`;
 const inr = (n,dec)=> '₹' + Number(n).toLocaleString('en-IN',{minimumFractionDigits:dec?2:0,maximumFractionDigits:2});
 const fmt = n => Number(n).toLocaleString('en-IN');
-const CRV = 5; // ₹ value of 1 MM credit
-const CRED = (s=16)=>`<svg class="coin" width="${s}" height="${s}" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9.5" fill="#1A1A1A"/><circle cx="10" cy="10" r="7.2" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".9"/><path d="M6.6 13V7.2l3.4 3.6 3.4-3.6V13" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const crWord = n => n===1?'MM credit':'MM credits';
 
 const STORE = [
   {id:'v1',kind:'voucher',brand:'Zestbite',title:'₹100 off on orders above ₹399',coins:800,val:100},
@@ -582,7 +579,7 @@ const STORE = [
 
 function initial(){
   return {
-    screen:'home', concept:1, faq:0,
+    screen:'home', faq:0,
     refs:[
       {id:'f1',name:'Ishaan Verma',phone:'+91 ••••• 4821',pays:0,days:26},
       {id:'f2',name:'Kavya Nair',phone:'+91 ••••• 7302',pays:1,days:21},
@@ -590,7 +587,7 @@ function initial(){
       {id:'f4',name:'Tanya Arora',phone:'+91 ••••• 6045',pays:6,days:5},
       {id:'f5',name:'Dev Malhotra',phone:'+91 ••••• 3376',pays:7,days:0},
       {id:'f6',name:'Anika Joshi',phone:'+91 ••••• 9910',pays:7,days:0}
-    ], refTab:'active', refClaimed:[], cashback:245.5, coins:1850, credit:12, freeSpins:1, spinMode:'wheel', rot:0, spinning:false,
+    ], refTab:'active', refClaimed:[], cashback:245.5, coins:1850, freeSpins:1, spinMode:'wheel', rot:0, spinning:false,
     storeTab:'voucher', storeCat:'All', vTab:'active', mTab:'active', ledgerOf:'cashback',
     vouchers:[
       {id:'u1',brand:'Zestbite',title:'₹150 off on your next order',code:'ZEST150MM',exp:'30 Nov 2026',src:'Allocated · Welcome reward',val:150,status:'active'},
@@ -600,13 +597,13 @@ function initial(){
     ],
     scratch:[
       {id:'s1',src:'Credit card bill paid',date:'10 Nov',r:{t:'coins',v:75},done:false},
-      {id:'s2',src:'Electricity bill paid',date:'8 Nov',r:{t:'credit',v:2},done:false},
+      {id:'s2',src:'Electricity bill paid',date:'8 Nov',r:{t:'coins',v:40},done:false},
       {id:'s3',src:'Friend joined via your link',date:'2 Nov',r:{t:'coins',v:50},done:true},
       {id:'s4',src:'Mobile recharge',date:'28 Oct',r:{t:'voucher',v:100,brand:'Groza'},done:true}
     ],
     milestones:[
       {id:'m1',hl:'Pay your CC bill, get',icon:'cc',title:'Pay this month’s credit card bill',reward:{t:'cash',v:100},cur:0,target:1,unit:'bill',ends:'30 Nov',cta:'pay-cc',status:'active'},
-      {id:'m3',hl:'Pay 3 utility bills, get',icon:'bolt',title:'Pay 3 utility bills in November',reward:{t:'credit',v:2},cur:3,target:3,unit:'bills',ends:'30 Nov',status:'claimable'},
+      {id:'m3',hl:'Pay 3 utility bills, get',icon:'bolt',title:'Pay 3 utility bills in November',reward:{t:'coins',v:100},cur:3,target:3,unit:'bills',ends:'30 Nov',status:'claimable'},
       {id:'m4',hl:'Pay ₹5,000 in bills, get',icon:'bag',title:'Pay ₹5,000 in bills this month',reward:{t:'voucher',v:200,brand:'Kartly'},cur:2800,target:5000,unit:'₹',ends:'30 Nov',cta:'pay-elec',status:'active'},
       {id:'m5',hl:'Check your credit score, get',icon:'flag',title:'Check your credit score',reward:{t:'coins',v:50},cur:1,target:1,unit:'check',ends:'',status:'claimed'}
     ],
@@ -617,13 +614,6 @@ function initial(){
         {t:'Referral reward · Priya joined',d:'2 Nov',a:200},
         {t:'Spin & Win',d:'29 Oct',a:10},
         {t:'Credit card bill cashback',d:'12 Oct',a:70.5}
-      ],
-      credit:[
-        {t:'Spin & Win',d:'9 Nov',a:2},
-        {t:'Used on Trailo gift card',d:'6 Nov',a:-2},
-        {t:'Scratch card · Friend joined',d:'2 Nov',a:1},
-        {t:'Credit card bill paid',d:'20 Oct',a:1},
-        {t:'Welcome reward',d:'12 Oct',a:10}
       ],
       coins:[
         {t:'Credit score check milestone',d:'9 Nov',a:50},
@@ -640,19 +630,18 @@ let S = initial();
 const $ = id => document.getElementById(id);
 const screenEl = $('screen');
 
-const rewardLabel = r => r.t==='credit' ? `${fmt(r.v)} ${crWord(r.v)}` : r.t==='coins' ? `${fmt(r.v)} coins` : r.t==='cash' ? `${inr(r.v)} cashback` : `${inr(r.v)} ${r.brand} voucher`;
-const rewardBadge = r => r.t==='credit' ? `<span class="badge b-navy">${CRED(14)} ${fmt(r.v)}</span>` : r.t==='coins' ? `<span class="badge b-gold">${COIN(14)} ${fmt(r.v)}</span>` : r.t==='cash' ? `<span class="badge b-gain">${inr(r.v)} cashback</span>` : `<span class="badge b-blue">${inr(r.v)} voucher</span>`;
+const rewardLabel = r => r.t==='coins' ? `${fmt(r.v)} coins` : r.t==='cash' ? `${inr(r.v)} cashback` : `${inr(r.v)} ${r.brand} voucher`;
+const rewardBadge = r => r.t==='coins' ? `<span class="badge b-gold">${COIN(14)} ${fmt(r.v)}</span>` : r.t==='cash' ? `<span class="badge b-gain">${inr(r.v)} cashback</span>` : `<span class="badge b-blue">${inr(r.v)} voucher</span>`;
 const activeVouchers = () => S.vouchers.filter(v=>v.status==='active');
 const pendingScratch = () => S.scratch.filter(s=>!s.done).length;
 const claimable = () => S.milestones.filter(m=>m.status==='claimable').length;
-const totalValue = () => S.cashback + S.coins/CPR + S.credit*CRV;
-const rIcon = (r,z) => r.t==='credit'?CRED(z):r.t==='coins'?COIN(z):r.t==='cash'?'<span style="color:var(--gain-600)">'+I.wallet+'</span>':mono(r.brand,z+6);
-const rVal = r => (r.t==='coins'||r.t==='credit')?fmt(r.v):inr(r.v);
-const rUnit = (r,suffix='') => (r.t==='credit'?'MM credit':r.t==='coins'?'coins':r.t==='cash'?'cashback':'voucher')+suffix;
+const totalValue = () => S.cashback + S.coins/CPR + activeVouchers().reduce((a,v)=>a+(v.val||0),0);
+const rIcon = (r,z) => r.t==='coins'?COIN(z):r.t==='cash'?'<span style="color:var(--gain-600)">'+I.wallet+'</span>':mono(r.brand,z+6);
+const rVal = r => r.t==='coins'?fmt(r.v):inr(r.v);
+const rUnit = (r,suffix='') => (r.t==='coins'?'coins':r.t==='cash'?'cashback':'voucher')+suffix;
 
 function credit(r, src){
-  if(r.t==='credit'){S.credit+=r.v;S.ledger.credit.unshift({t:src,d:'Today',a:r.v});}
-  else   if(r.t==='coins'){S.coins+=r.v;S.ledger.coins.unshift({t:src,d:'Today',a:r.v});}
+  if(r.t==='coins'){S.coins+=r.v;S.ledger.coins.unshift({t:src,d:'Today',a:r.v});}
   else if(r.t==='cash'){S.cashback+=r.v;S.ledger.cashback.unshift({t:src,d:'Today',a:r.v});}
   else if(r.t==='voucher'){S.vouchers.unshift({id:'u'+Date.now(),brand:r.brand,title:`${inr(r.v)} off on ${r.brand}`,code:(r.brand.slice(0,3).toUpperCase())+'-'+Math.random().toString(36).slice(2,8).toUpperCase(),exp:'31 Dec 2026',src:src,val:r.v,status:'active'});}
 }
@@ -672,7 +661,6 @@ function topbar(){
 }
 function waysSec(){
   return `    <section class="sec">
-      ${S.concept===1?'<div class="sec-h"><h4>Ways to earn</h4></div>':''}
       <div class="circles">
         ${circ('spin','wheel','Spin & Win',S.freeSpins?S.freeSpins+' free':'')}
         ${circ('scratch','card','Scratch Cards',pendingScratch()?pendingScratch()+' new':'')}
@@ -688,19 +676,20 @@ function home(){
   const ms = S.milestones.filter(m=>m.status!=='claimed');
   return `<div class="tabscreen">
   ${topbar()}
-  <div class="hbody" style="padding-top:12px">
-    ${S.concept===2?waysSec():''}
+  <div class="hbody" style="padding-top:4px">
+    <h1 class="page-t">Mint Rewards</h1>
+    ${waysSec()}
     <section class="sec">
-      <div class="card wcard ${S.concept===2?'uc2':''}">
-        ${S.concept===1?`<div style="text-align:center">
+      <div class="card wcard">
+        <div style="text-align:left;display:flex;flex-direction:column;align-items:flex-start">
           <div class="cap up">Total rewards value</div>
           <div class="worth num">${inr(Math.floor(totalValue()))}</div>
           <span class="badge b-gain" style="margin-top:6px">${I.trend} ${inr(Math.floor(S.cashback))} cashback ready to use</span>
-        </div>`:`<div class="cap up" style="text-align:center">Earned rewards</div>`}
+        </div>
         <div class="balrow">
           <button class="tap bal2" data-ledger="cashback"><span class="bic" style="color:var(--gain-600)">${I.wallet}</span><span><span class="cap">Cashback</span><b class="num">${inr(S.cashback,true)}</b></span></button>
           <button class="tap bal2" data-ledger="coins"><span class="bic">${COIN(20)}</span><span><span class="cap">Coins</span><b class="num">${fmt(S.coins)}</b></span></button>
-          <button class="tap bal2" data-ledger="credit"><span class="bic">${CRED(20)}</span><span><span class="cap">MM Credit</span><b class="num">${fmt(S.credit)}</b></span></button>
+          <button class="tap bal2" data-go="vouchers"><span class="bic">${I.ticket}</span><span><span class="cap">Vouchers</span><b class="num">${activeVouchers().length}</b></span></button>
         </div>
         <button class="link-u" data-go="how">How rewards work →</button>
       </div>
@@ -715,8 +704,6 @@ function home(){
       <svg width="104" height="104" viewBox="0 0 300 300" aria-hidden="true" style="flex-shrink:0;transform:rotate(-12deg);filter:drop-shadow(0 8px 14px rgba(150,90,0,.25))">${wheelSVG(WHEEL)}<circle cx="150" cy="150" r="34" fill="#fff"/></svg>
     </button>
     <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
-
-    ${S.concept===1?waysSec():''}
 
     <section class="sec">
       <div class="sec-h"><h4>Milestones</h4><button class="link" data-go="milestones">View all →</button></div>
@@ -733,7 +720,7 @@ function home(){
     <section class="sec">
       <div class="sec-h"><h4>Pay &amp; earn</h4></div>
       <div class="card rowlist">
-        ${actRow('cc','Credit card','1% cashback + 1 MM credit','pay-cc')}
+        ${actRow('cc','Credit card','1% cashback + scratch card','pay-cc')}
         ${actRow('bolt','Electricity','50 coins + scratch card','pay-elec')}
         ${actRow('phone','Mobile recharge','25 coins on every recharge','pay-mob')}
         ${actRow('people','Refer a friend','Up to 480 coins per friend','refer')}
@@ -773,7 +760,7 @@ function laurel(){ let s='<path d="M34 62C14 52 8 30 16 6" fill="none" stroke="#
 function circ(go,ic,label,tag){
   return `<button class="tap circ" data-go="${go}">${tag?`<span class="ctag">${tag}</span>`:''}<span class="cbtn">${I[ic]}</span><span class="cl">${label}</span></button>`;
 }
-const shortR = r => r.t==='credit' ? `${fmt(r.v)} ${crWord(r.v)}` : r.t==='coins' ? `${fmt(r.v)} coins` : r.t==='cash' ? `₹${fmt(r.v)} cashback` : `₹${r.v} voucher`;
+const shortR = r => r.t==='coins' ? `${fmt(r.v)} coins` : r.t==='cash' ? `₹${fmt(r.v)} cashback` : `₹${r.v} voucher`;
 function msOffer(m){
   const pct = Math.min(100, m.cur/m.target*100);
   const prog = m.unit==='₹' ? `${inr(m.cur)} / ${inr(m.target)}` : `${m.cur}/${m.target} ${m.unit}`;
@@ -834,10 +821,10 @@ function spin(){
         <button class="hub" id="spinBtn" ${S.spinning?'disabled':''}>SPIN</button>
       </div>` : `
       <div class="slots" aria-live="polite"><div class="reel" id="r0">7</div><div class="reel" id="r1">M</div><div class="reel" id="r2">★</div></div>
-      <div class="prize-strip"><span class="pz">7 7 7 · 500 coins</span><span class="pz">₹ ₹ ₹ · 2 MM credits</span><span class="pz">Any 3 match · 200</span><span class="pz">Any 2 match · 25</span></div>`}
+      <div class="prize-strip"><span class="pz">7 7 7 · 500 coins</span><span class="pz">₹ ₹ ₹ · ₹20 cashback</span><span class="pz">Any 3 match · 200</span><span class="pz">Any 2 match · 25</span></div>`}
       <button class="btn btn-lg full ${S.freeSpins?'btn-gold':'btn-blue'}" id="spinCta" ${S.spinning||(!S.freeSpins&&S.coins<20)?'disabled':''}>
         ${S.spinning?'Spinning…':S.freeSpins?'Use free spin':'Spin for 20 coins'}</button>
-      ${S.spinMode==='wheel'?`<div class="prize-strip">${['500 coins','1 MM credit','₹10 cashback','50 coins'].map(p=>`<span class="pz">${p}</span>`).join('')}</div>`:''}
+      ${S.spinMode==='wheel'?`<div class="prize-strip">${['500 coins','75 coins','₹10 cashback','50 coins'].map(p=>`<span class="pz">${p}</span>`).join('')}</div>`:''}
       <p style="margin:0;text-align:center;font-size:12px;color:rgba(255,255,255,.4)">1 free spin every day. Pay any bill to get 2 more.</p>
     </div></div>`;
 }
@@ -849,7 +836,7 @@ const WHEEL = [
   {l:'100',sub:'coins',r:{t:'coins',v:100},w:6},
   {l:'Oops',sub:'try again',r:null,w:12},
   {l:'500',sub:'coins',r:{t:'coins',v:500},w:2,jack:true},
-  {l:'1',sub:'MM credit',r:{t:'credit',v:1},w:8}
+  {l:'75',sub:'coins',r:{t:'coins',v:75},w:8}
 ];
 function wheelSVG(segs){
   const cx=150,cy=150,R=146,n=segs.length,step=360/n;
@@ -873,7 +860,7 @@ function scratchScreen(){
     <div style="padding:0 16px 32px;display:flex;flex-direction:column;gap:16px">
       <div class="card" style="padding:16px;display:flex;justify-content:space-between;align-items:center">
         <div><div class="cap" style="font-weight:600">To scratch</div><div style="font-size:22px;font-weight:800" class="num">${pendingScratch()}</div></div>
-        <div style="text-align:right"><div class="cap" style="font-weight:600">Won so far</div><div style="font-size:14px;font-weight:700" class="num">${fmt(won.filter(s=>s.r.t==='coins').reduce((a,s)=>a+s.r.v,0))} coins · ${inr(won.filter(s=>s.r.t==='cash').reduce((a,s)=>a+s.r.v,0))} · ${won.filter(s=>s.r.t==='credit').reduce((a,s)=>a+s.r.v,0)} credit</div></div>
+        <div style="text-align:right"><div class="cap" style="font-weight:600">Won so far</div><div style="font-size:14px;font-weight:700" class="num">${fmt(won.filter(s=>s.r.t==='coins').reduce((a,s)=>a+s.r.v,0))} coins · ${inr(won.filter(s=>s.r.t==='cash').reduce((a,s)=>a+s.r.v,0))}</div></div>
       </div>
       <div class="grid2">${S.scratch.map(s=>`<button class="tap" data-scratch="${s.id}" style="display:flex;flex-direction:column;gap:8px">
         ${s.done?`<div class="sc-face open" style="height:150px">${rIcon(s.r,26)}<b style="font-size:22px">${rVal(s.r)}</b><span class="cap">${s.r.t==='voucher'?s.r.brand+' voucher':rUnit(s.r,' credited')}</span></div>`
@@ -932,23 +919,22 @@ function vouchersScreen(){
 }
 
 function ledgerScreen(){
-  const L = S.ledgerOf, isCash = L==='cashback', isCr = L==='credit';
+  const L = S.ledgerOf, isCash = L==='cashback';
   const rows = S.ledger[L];
-  const fmtAmt = a => isCash ? inr(Math.abs(a),Math.abs(a)%1!==0) : isCr ? fmt(Math.abs(a))+' '+(Math.abs(a)===1?'credit':'credits') : fmt(Math.abs(a));
+  const fmtAmt = a => isCash ? inr(Math.abs(a),Math.abs(a)%1!==0) : fmt(Math.abs(a));
   return `<div class="light" style="min-height:100%">
-    ${appbar(isCash?'Cashback wallet':isCr?'MM credit':'Mint coins')}
+    ${appbar(isCash?'Cashback wallet':'Mint coins')}
     <div style="padding:0 16px"><div class="card wcard" style="text-align:center">
-        <div class="cap up">${isCash?'Available cashback':isCr?'MM credit balance':'Coin balance'}</div>
-        <div class="worth num" style="display:flex;align-items:center;justify-content:center;gap:10px;${isCash?'color:var(--gain-600)':''}">${isCash?inr(S.cashback,true):isCr?CRED(34)+fmt(S.credit):COIN(34)+fmt(S.coins)}</div>
-        <div class="cap" style="margin-top:-4px">${isCash?'₹45 expires on 31 Dec 2026':isCr?'Worth '+inr(S.credit*CRV)+' · 1 MM credit = ₹5':'Worth '+inr(Math.floor(S.coins/CPR))+' in the store · 24 coins = ₹1'}</div>
+        <div class="cap up">${isCash?'Available cashback':'Coin balance'}</div>
+        <div class="worth num" style="display:flex;align-items:center;justify-content:center;gap:10px;${isCash?'color:var(--gain-600)':''}">${isCash?inr(S.cashback,true):COIN(34)+fmt(S.coins)}</div>
+        <div class="cap" style="margin-top:-4px">${isCash?'₹45 expires on 31 Dec 2026':'Worth '+inr(Math.floor(S.coins/CPR))+' in the store · 24 coins = ₹1'}</div>
         <div style="display:flex;gap:8px">
           ${isCash?`<button class="btn btn-md btn-gold" style="flex:1" data-act="pay-cc">Pay a bill</button><button class="btn btn-md btn-peach" data-toast="Cashback is auto-applied on Mint Money bill payments">How it works</button>`
-          :isCr?`<button class="btn btn-md btn-gold" style="flex:1" data-store="cash">Use on gift cards</button><button class="btn btn-md btn-peach" data-act="pay-cc">Earn more</button>`
           :`<button class="btn btn-md btn-gold" style="flex:1" data-go="store">Redeem coins</button><button class="btn btn-md btn-peach" data-go="spin">Earn more</button>`}
         </div>
     </div></div>
     <div class="hbody" style="padding-top:20px">
-      <div class="tabs"><button class="${isCash?'on':''}" data-ledger="cashback">Cashback</button><button class="${L==='coins'?'on':''}" data-ledger="coins">Coins</button><button class="${isCr?'on':''}" data-ledger="credit">MM credit</button></div>
+      <div class="tabs"><button class="${isCash?'on':''}" data-ledger="cashback">Cashback</button><button class="${L==='coins'?'on':''}" data-ledger="coins">Coins</button></div>
       <div class="sec-h"><h4>History</h4></div>
       <div class="card rowlist">${rows.map(r=>`<div class="row"><div class="mid"><div class="t" style="font-weight:600">${r.t}</div><div class="s">${r.d}</div></div>
         <span class="${r.a>0?'amt-pos':'amt-neg'}">${r.a>0?'+':'−'}${fmtAmt(r.a)}</span></div>`).join('')}</div>
@@ -958,8 +944,8 @@ function ledgerScreen(){
 
 /* ---------- How rewards work ---------- */
 const FAQ = [
-  ['Do coins and MM credit expire?','Cashback, coins and MM credit stay in your wallet until they are used. Vouchers and gift cards have their own validity, shown on each one in My vouchers.'],
-  ['Can I use coins and MM credit together?','Yes. At gift card checkout you can pay with coins, add cashback, and then apply MM credit. Each one reduces what you pay in rupees.'],
+  ['Do cashback and coins expire?','Cashback and coins stay in your wallet until they are used. Vouchers and gift cards have their own validity, shown on each one in My vouchers.'],
+  ['Can I use coins and cashback together?','Yes. At gift card checkout you can pay with coins and add cashback. Each one reduces what you pay in rupees.'],
   ['Where do I see what I earned?','Tap any balance on the Rewards tab. Each one has its own history with every credit and every spend.'],
   ['Why did my scratch card not give a reward?','Every scratch card gives a reward. If one is missing, pay the bill again from Pay & earn or check Scratch cards for an unopened card.']
 ];
@@ -974,22 +960,22 @@ function howScreen(){
     <div class="hbody" style="padding-top:4px">
       <p style="margin:0;font-size:15px;line-height:1.55;color:#3A3A3A">Every bill you pay earns rewards. There are three kinds, and each one can be used in a different way.</p>
 
-      <div class="hw-rates">
-        ${rate('₹1','24 coins')}${rate('1 MM credit','₹5')}${rate('1 cashback ₹','₹1')}
+      <div class="hw-rates" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        ${rate('₹1','24 coins')}${rate('1 cashback ₹','₹1')}
       </div>
 
       ${type('<span style="color:var(--gain-600)">'+I.wallet+'</span>','Cashback','Real money in your wallet',[['Earn','Bill payments, spins, milestones'],['Use','Applied on your next bill payment, or on gift cards']])}
       ${type(COIN(26),'Coins','Spend on vouchers, deals and gift cards',[['Earn','Bills, referrals, spins, scratch cards, milestones'],['Use','24 coins = ₹1 in the rewards store']])}
-      ${type(CRED(26),'MM Credit','Worth more per unit, used on gift cards',[['Earn','Credit card bills, spins, scratch cards, milestones'],['Use','1 MM credit = ₹5 off at gift card checkout']])}
+      ${type('<span>'+I.ticket+'</span>','Vouchers','Deals and gift cards you own',[['Earn','Scratch cards, milestones, and the rewards store'],['Use','Open My vouchers, copy the code and apply it at the brand checkout']])}
 
       <section class="sec"><div class="sec-h"><h4>What you earn</h4></div>
         <div class="card rowlist">
-          ${earn('cc','Pay credit card bill','1% cashback + 1 MM credit')}
+          ${earn('cc','Pay credit card bill','1% cashback + scratch card')}
           ${earn('bolt','Pay electricity bill','50 coins + scratch card')}
           ${earn('phone','Recharge mobile','25 coins')}
           ${earn('people','Refer a friend','Up to 480 coins')}
           ${earn('wheel','Spin &amp; Win','Up to 500 coins')}
-          ${earn('flag','Complete milestones','Cashback, coins or MM credit')}
+          ${earn('flag','Complete milestones','Cashback, coins or vouchers')}
         </div>
       </section>
 
@@ -997,7 +983,7 @@ function howScreen(){
         <div class="card hw-steps">
           <div><span class="hw-n">1</span><div><b>Collect</b><span>Pay bills and play Spin &amp; Win to build your balances.</span></div></div>
           <div><span class="hw-n">2</span><div><b>Choose</b><span>Open the rewards store and pick a voucher, deal or gift card.</span></div></div>
-          <div><span class="hw-n">3</span><div><b>Pay less</b><span>Apply coins, cashback and MM credit. You see the final price before you confirm.</span></div></div>
+          <div><span class="hw-n">3</span><div><b>Pay less</b><span>Apply coins and cashback. You see the final price before you confirm.</span></div></div>
         </div>
       </section>
 
@@ -1284,11 +1270,10 @@ function render(keepScroll){
   const tab = S.screen==='home'; $('device').classList.toggle('has-nav',tab);
   screenEl.innerHTML = SCREENS[S.screen]();
   screenEl.scrollTop = st;
-  $('conceptBox').innerHTML = `<div class="label" style="margin-bottom:8px">Concept</div><div class="tabs"><button class="${S.concept===1?'on':''}" data-concept="1">UC 1 · Total value</button><button class="${S.concept===2?'on':''}" data-concept="2">UC 2 · Balances</button></div><p class="cap" style="margin:8px 0 0;color:var(--n-600)">${S.concept===1?'One combined rewards value above the three balances.':'No combined value. Only cashback, coins and MM credit.'}</p>`;
   const dm=$('demoBox'); dm.hidden=!S.screen.startsWith('refer');
   dm.innerHTML = `<div class="label" style="margin-bottom:8px">Demo controls</div><div class="demo"><button data-demo="pay">Friend pays a bill</button><button data-demo="five">5 friends join &amp; pay</button><button data-demo="clear">Clear friends (empty state)</button></div>`;
   $('railNav').innerHTML = RAIL.map(([k,l,s])=>`<button class="${S.screen===k?'on':''}" data-go="${k}">${l}<small>${s}</small></button>`).join('');
-  $('stateBox').innerHTML = `<span>Cashback</span><span class="num">${inr(S.cashback,true)}</span><span>Coins</span><span class="num">${fmt(S.coins)}</span><span>MM credit</span><span class="num">${S.credit}</span><span>Active vouchers</span><span class="num">${activeVouchers().length}</span><span>Free spins</span><span class="num">${S.freeSpins}</span>`;
+  $('stateBox').innerHTML = `<span>Cashback</span><span class="num">${inr(S.cashback,true)}</span><span>Coins</span><span class="num">${fmt(S.coins)}</span><span>Active vouchers</span><span class="num">${activeVouchers().length}</span><span>Free spins</span><span class="num">${S.freeSpins}</span>`;
 }
 function go(s){ S.screen=s; closeSheet(); render(); }
 
@@ -1332,7 +1317,7 @@ function doSlots(){
   setTimeout(()=>{
     clearInterval(iv); S.spinning=false;
     let reward=null;
-    if(res[0]===res[1]&&res[1]===res[2]) reward = res[0]==='₹' ? {t:'credit',v:2} : {t:'coins',v:res[0]==='7'?500:200};
+    if(res[0]===res[1]&&res[1]===res[2]) reward = res[0]==='₹' ? {t:'cash',v:20} : {t:'coins',v:res[0]==='7'?500:200};
     else if(res[0]===res[1]||res[1]===res[2]||res[0]===res[2]) reward={t:'coins',v:25};
     spinResult(reward,'Slot machine', res);
   },2100);
@@ -1345,8 +1330,8 @@ function spinResult(r, src, reels){
     <div style="text-align:center;display:flex;flex-direction:column;gap:14px;padding-top:6px">
       <div class="win-ic">${rIcon(r,36)}</div>
       <h5>You won <span class="num">${rewardLabel(r)}</span></h5>
-      <p class="muted" style="margin:0;font-size:14px">${r.t==='credit'?'Added to your MM credit. 1 credit = ₹5 off on gift cards.':r.t==='coins'?'Added to your coin balance. Spend them in the rewards store.':'Added to your cashback wallet. It will be used on your next bill payment.'}</p>
-      <div style="display:flex;gap:8px"><button class="btn btn-md btn-ghost" style="flex:1" data-close>${S.freeSpins||S.coins>=20?'Spin again':'Done'}</button><button class="btn btn-md btn-gold" style="flex:1" ${r.t==='credit'?'data-store="cash"':`data-go="${r.t==='coins'?'store':'ledger'}"`}>${r.t==='credit'?'Use credit':r.t==='coins'?'Use coins':'View wallet'}</button></div>
+      <p class="muted" style="margin:0;font-size:14px">${r.t==='coins'?'Added to your coin balance. Spend them in the rewards store.':'Added to your cashback wallet. It will be used on your next bill payment.'}</p>
+      <div style="display:flex;gap:8px"><button class="btn btn-md btn-ghost" style="flex:1" data-close>${S.freeSpins||S.coins>=20?'Spin again':'Done'}</button><button class="btn btn-md btn-gold" style="flex:1" data-go="${r.t==='coins'?'store':'ledger'}">${r.t==='coins'?'Use coins':'View wallet'}</button></div>
     </div>` : `
     <div style="text-align:center;display:flex;flex-direction:column;gap:14px;padding-top:6px">
       <h5>No win this time</h5>
@@ -1360,7 +1345,6 @@ function openScratch(id){
   const s = S.scratch.find(x=>x.id===id);
   const rv = s.r.t==='coins'?`${COIN(40)}<div style="font-size:30px;font-weight:800;margin-top:8px" class="num">${fmt(s.r.v)}</div><div class="cap" style="font-weight:600">coins</div>`
     : s.r.t==='cash'?`<div class="win-ic" style="color:var(--gain-600)">${I.wallet}</div><div style="font-size:30px;font-weight:800" class="num">${inr(s.r.v)}</div><div class="cap" style="font-weight:600">cashback</div>`
-    : s.r.t==='credit'?`${CRED(48)}<div style="font-size:30px;font-weight:800;margin-top:8px" class="num">${fmt(s.r.v)}</div><div class="cap" style="font-weight:600">${crWord(s.r.v)} · ${inr(s.r.v*CRV)}</div>`
     : `${mono(s.r.brand,48)}<div style="font-size:30px;font-weight:800;margin-top:8px" class="num">${inr(s.r.v)} off</div><div class="cap" style="font-weight:600">${s.r.brand} voucher</div>`;
   openSheet(`<div style="display:flex;flex-direction:column;gap:14px;text-align:center">
     <h5>${s.done?'You won':'Scratch to reveal'}</h5>
@@ -1394,7 +1378,7 @@ function openScratch(id){
 let R = {};
 function openItem(id){
   const x = STORE.find(i=>i.id===id);
-  R = {id, d: x.denoms?pickD(x):0, method: 'coins', useCb:false, useCr:false};
+  R = {id, d: x.denoms?pickD(x):0, method: 'coins', useCb:false};
   if(x.kind==='cash' && S.coins < R.d*CPR) R.method = S.coins>0?'mix':'cash';
   drawItem();
 }
@@ -1409,8 +1393,7 @@ function drawItem(){
   const x = STORE.find(i=>i.id===R.id);
   const q = quote(x);
   const cbUse = R.useCb ? Math.min(S.cashback, q.cash) : 0;
-  const crN = R.useCr ? Math.min(S.credit, Math.floor((q.cash - cbUse)/CRV)) : 0;
-  const payNow = +(q.cash - cbUse - crN*CRV).toFixed(2);
+  const payNow = +(q.cash - cbUse).toFixed(2);
   const enough = S.coins >= q.coins;
   let body='';
   if(x.kind==='cash'){
@@ -1426,13 +1409,11 @@ function drawItem(){
       ${S.coins<R.d*CPR?`<span class="cap">You have ${fmt(S.coins)} coins. ${fmt(R.d*CPR-S.coins)} more needed to pay fully with coins.</span>`:''}
     </div>
     ${q.cash>0 && S.cashback>0?`<div class="toggle" data-cb role="switch" aria-checked="${R.useCb}" tabindex="0"><div style="flex:1"><div style="font-size:14px;font-weight:700">Use cashback</div><div class="cap num">${inr(S.cashback,true)} available</div></div><span class="sw ${R.useCb?'on':''}"></span></div>`:''}
-    ${q.cash-cbUse>=CRV && S.credit>0?`<div class="toggle" data-cr role="switch" aria-checked="${R.useCr}" tabindex="0"><div style="flex:1"><div style="font-size:14px;font-weight:700">Use MM credit</div><div class="cap num">${S.credit} credits · ${inr(S.credit*CRV)} available</div></div><span class="sw ${R.useCr?'on':''}"></span></div>`:''}
     <div class="kv">
       <div><span>Gift card value</span><span>${inr(R.d)}</span></div>
       ${R.method==='cash'?`<div><span>Instant discount</span><span style="color:var(--gain-600)">−${inr(R.d-q.cash,true)}</span></div>`:''}
       ${q.coins?`<div><span>Coins used</span><span>${fmt(q.coins)} (${inr(+(q.coins/CPR).toFixed(2),true)})</span></div>`:''}
       ${cbUse?`<div><span>Cashback used</span><span>−${inr(cbUse,true)}</span></div>`:''}
-      ${crN?`<div><span>MM credit used</span><span>${crN} ${crN===1?'credit':'credits'} (−${inr(crN*CRV)})</span></div>`:''}
       <div class="tot"><span>You pay</span><span>${payNow>0?inr(payNow,true):'₹0'}</span></div>
     </div>`;
   } else {
@@ -1454,10 +1435,8 @@ function drawItem(){
 function buy(){
   const x = STORE.find(i=>i.id===R.id); const q = quote(x);
   const cbUse = R.useCb ? Math.min(S.cashback, q.cash) : 0;
-  const crN = R.useCr ? Math.min(S.credit, Math.floor((q.cash - cbUse)/CRV)) : 0;
-  const payNow = +(q.cash - cbUse - crN*CRV).toFixed(2);
+  const payNow = +(q.cash - cbUse).toFixed(2);
   if(q.coins){ S.coins-=q.coins; S.ledger.coins.unshift({t:'Redeemed · '+x.brand+(x.kind==='cash'?' gift card':''),d:'Today',a:-q.coins}); }
-  if(crN){ S.credit-=crN; S.ledger.credit.unshift({t:'Used on '+x.brand+' gift card',d:'Today',a:-crN}); }
   if(cbUse){ S.cashback-=cbUse; S.ledger.cashback.unshift({t:'Used on '+x.brand+' gift card',d:'Today',a:-cbUse}); }
   const code = x.brand.slice(0,3).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()+'-'+Math.floor(1000+Math.random()*9000);
   const title = x.kind==='cash' ? `${x.title} ${inr(R.d)}` : x.title;
@@ -1489,18 +1468,17 @@ function act(a){
   closeSheet();
   if(a==='refer'){ go('refer'); return; }
   const map = {
-    'pay-cc':{name:'Credit card bill',amt:12400,r:{t:'coins',v:[50,75,120][Math.floor(Math.random()*3)]},cb:100,cr:1},
-    'pay-elec':{name:'Electricity bill',amt:1860,r:Math.random()<.4?{t:'credit',v:1}:{t:'cash',v:[10,15,25][Math.floor(Math.random()*3)]},coins:50},
+    'pay-cc':{name:'Credit card bill',amt:12400,r:{t:'coins',v:[50,75,120][Math.floor(Math.random()*3)]},cb:100},
+    'pay-elec':{name:'Electricity bill',amt:1860,r:{t:'cash',v:[10,15,25][Math.floor(Math.random()*3)]},coins:50},
     'pay-mob':{name:'Mobile recharge',amt:349,r:{t:'coins',v:[10,20][Math.floor(Math.random()*2)]},coins:25}
   }[a];
   S.scratch.unshift({id:'s'+Date.now(),src:map.name+' paid',date:'Today',r:map.r,done:false});
   if(map.cb){ const c=Math.min(map.cb,Math.round(map.amt*0.01)); credit({t:'cash',v:c},'Credit card bill cashback'); const m=S.milestones.find(x=>x.id==='m1'); if(m.status==='active'){m.cur=1;m.status='claimable';} }
   if(map.coins) credit({t:'coins',v:map.coins},map.name);
-  if(map.cr) credit({t:'credit',v:map.cr},map.name);
   const m4=S.milestones.find(x=>x.id==='m4'); if(m4.status==='active'){ m4.cur=Math.min(m4.target,m4.cur+map.amt); if(m4.cur>=m4.target) m4.status='claimable'; }
   S.freeSpins+=2;
   render(true);
-  toast(`${map.name} of ${inr(map.amt)} paid. You earned a scratch card${map.cr?', 1 MM credit':''} and 2 free spins.`);
+  toast(`${map.name} of ${inr(map.amt)} paid. You earned a scratch card and 2 free spins.`);
 }
 function claim(id){
   const m=S.milestones.find(x=>x.id===id); m.status='claimed';
@@ -1514,7 +1492,6 @@ document.addEventListener('click',e=>{
   const t = e.target.closest('button,[data-cb],[data-cr],[data-wgo]'); if(!t) return;
   const d = t.dataset;
   if(t.id==='spinBtn'||t.id==='spinCta'){ S.spinMode==='wheel'?doWheel():doSlots(); return; }
-  if(d.concept){ S.concept=+d.concept; go('home'); return; }
   if(d.faq!==undefined){ const i=+d.faq; S.faq = S.faq===i?-1:i; render(true); return; }
   if(d.wgo){ go(d.wgo); return; }
   if(d.rtab){ S.refTab=d.rtab; render(true); return; }
@@ -1556,7 +1533,6 @@ document.addEventListener('click',e=>{
   if(d.denom){ R.d=+d.denom; const x=STORE.find(i=>i.id===R.id); if(R.method==='coins'&&S.coins<R.d*CPR) R.method=S.coins>=CPR?'mix':'cash'; drawItem(); return; }
   if(d.method){ R.method=d.method; drawItem(); return; }
   if('cb' in d){ R.useCb=!R.useCb; drawItem(); return; }
-  if('cr' in d){ R.useCr=!R.useCr; drawItem(); return; }
   if('buy' in d){ buy(); return; }
   if(d.voucher){ openVoucher(d.voucher); return; }
   if(d.markused){ S.vouchers.find(v=>v.id===d.markused).status='used'; closeSheet(); render(true); toast('Voucher moved to Used'); return; }
@@ -1568,7 +1544,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{ if(e.target.id==='gcq'){ S.gcQ=e.target.value; $('gcList').innerHTML=gcList(S.gcQ.trim().toLowerCase()); } });
 document.addEventListener('keydown',e=>{ if((e.key==='Enter')&&e.target.matches('[data-wgo]')){ go(e.target.dataset.wgo); return; } if(e.key==='Escape') closeSheet(); if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-cb],[data-cr]')){e.preventDefault();if(e.target.matches('[data-cr]'))R.useCr=!R.useCr;else R.useCb=!R.useCb;drawItem();} });
-$('resetBtn').onclick=()=>{ const c=S.concept; S=initial(); S.concept=c; closeSheet(); render(); toast('Prototype reset'); };
+$('resetBtn').onclick=()=>{ S=initial(); closeSheet(); render(); toast('Prototype reset'); };
 
 render();
 })();

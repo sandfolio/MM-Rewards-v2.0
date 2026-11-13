@@ -8,21 +8,26 @@ Open `index.html` in a browser. There is no build step and no dependencies. Font
 
 ## What's inside
 
-- **Rewards tab (Home):** balances, Spin & win banner, Ways to earn, Milestones, Scratch cards, Pay & earn, Spend your coins, Gift cards, bottom links, bottom nav.
-- **Concepts** (switch in the left panel):
-  - UC 1: single combined rewards value above the balances.
-  - UC 2: no combined value, only Cashback, Coins and MM Credit; Ways to earn moves to the top.
-- **Other screens:** How rewards work, Spin & Win (wheel and slots), Scratch cards, Milestones, Rewards store (Vouchers, Deals, Gift cards), Gift cards (dark brand store), My vouchers, Cashback / Coins / MM Credit history.
+- **Rewards tab (Home):** balances (Cashback, Coins, Vouchers), Spin & win banner, Ways to earn, Milestones, Refer & earn, Scratch cards, Pay & earn, Spend your coins, Gift cards, bottom links, bottom nav.
+- **Layout:** Mint Rewards title, Ways to earn, Total rewards value widget (Cashback, Coins, Vouchers), then Spin banner and the sections below.
+- **Other screens:** How rewards work, Spin & Win (wheel and slots), Scratch cards, Milestones, Rewards store (Vouchers, Deals, Gift cards), Gift cards (dark brand store), My vouchers, Cashback / Coins history, and the Refer & earn flow (below).
+
+## Refer & earn
+
+- **Home widget:** tap anywhere (or "Refer now →") to open the Refer landing page.
+- **Refer landing:** WhatsApp invite, share, contacts, summary, friend-count bonuses (10 / 20 / 30), links to Track earnings, How it works and Terms and conditions.
+- **Track earnings dashboard:** total coins earned, joined / active / completed counts, bonus milestones with Claim, Active and Completed friend lists with a 7-payment progress track, Remind, and empty states.
+- **Demo controls** (left panel, referral screens only): friend pays a bill, 5 friends join and pay, clear friends.
+- Placeholder values, to confirm: 120 / 120 / 240 coins on a friend's 1st / 4th / 7th bill (480 per friend); bonuses of 1,500 / 3,500 / 6,000 coins. Terms text is placeholder. Friend names and phone numbers are fictional and masked.
 
 ## Reward rules used in the prototype
 
 | Currency | Rule |
 | --- | --- |
 | Coins | 24 coins = ₹1 |
-| MM Credit | 1 credit = ₹5, spendable on gift cards |
 | Cashback | ₹1 = ₹1, applied on bill payments or gift cards |
 
-Gift card checkout lets you pay with coins, coins + ₹ or ₹, then apply cashback and MM Credit. "Pay now" buttons simulate a bill payment and earn rewards.
+Gift card checkout lets you pay with coins, coins + ₹ or ₹, then apply cashback. "Pay now" buttons simulate a bill payment and earn rewards.
 
 ## Notes
 
